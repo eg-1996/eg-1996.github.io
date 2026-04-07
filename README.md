@@ -257,7 +257,7 @@
         <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA11913666" target="_blank">Edifier R1100</a></div>
         <div class="opt-desc">Description TBD</div>
       </div>
-      <div class="option-card" onclick="selectOption('q1', this, 'KEF Q150')">
+      <div class="option-card" onclick="selectOption('q1', this, 'Parlantes Hypersound SP-X2')">
         <span class="opt-icon">🎵</span>
         <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA20011733" target="_blank">Parlantes Hypersound SP-X2</a></div>
         <div class="opt-desc">Description TBD</div>
@@ -293,7 +293,7 @@
         <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA47772582" target="_blank">Mueble De Tv Rack Dielfe</a></div>
         <div class="opt-desc">Description TBD</div>
       </div>
-      <div class="option-card" onclick="selectOption('q2', this, 'Estante de pared flotante personalizado')">
+      <div class="option-card" onclick="selectOption('q2', this, 'TBD')">
         <span class="opt-icon">🧱</span>
         <div class="opt-name"><a href="javascript:void(0)" target="_blank">TBD</a></div>
         <div class="opt-desc">Description TBD</div>
