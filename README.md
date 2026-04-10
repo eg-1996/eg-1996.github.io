@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -279,6 +280,53 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
 .qs-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:#8B6A4A; margin-bottom:0.5rem; }
 .qs-item { font-size:0.82rem; color:#2C1A0E; margin-bottom:0.2rem; }
 .qs-item strong { font-weight:600; }
+
+/* ── gift list modal ── */
+#gift-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(28,15,5,0.7); z-index: 100;
+  align-items: center; justify-content: center; padding: 1.5rem 1rem;
+}
+#gift-modal-overlay.open { display: flex; }
+#gift-modal {
+  background: #F5ECD7; border-radius: 18px; width: 100%; max-width: 440px;
+  max-height: 88vh; overflow-y: auto; padding: 2rem 1.6rem;
+  position: relative; box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+}
+.gm-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 1.4rem; cursor: pointer;
+  color: #8B4513; line-height: 1;
+}
+.gm-close:hover { color: #1C0F05; }
+.gm-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; color: #1C0F05; margin-bottom: 0.25rem; }
+.gm-sub { font-size: 0.85rem; color: #6B4423; font-style: italic; margin-bottom: 1.6rem; }
+.gm-section { margin-bottom: 1.4rem; }
+.gm-section-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em;
+  color: #8B6A4A; margin-bottom: 0.7rem; border-bottom: 1px dashed #C4A87A; padding-bottom: 0.4rem;
+}
+.gm-item {
+  display: flex; align-items: center; gap: 10px;
+  background: #FDF6E8; border: 1.5px solid #D4B896; border-radius: 10px;
+  padding: 0.7rem 0.9rem; margin-bottom: 0.5rem;
+}
+.gm-item-icon { font-size: 18px; flex-shrink: 0; }
+.gm-item-name { font-size: 0.88rem; font-weight: 500; color: #1C0F05; flex: 1; }
+.gm-item-link {
+  font-size: 0.78rem; background: #8B4513; color: #F5ECD7;
+  padding: 5px 12px; border-radius: 20px; text-decoration: none;
+  white-space: nowrap; flex-shrink: 0; font-family: 'Lora', serif;
+}
+.gm-item-link:hover { background: #6B3410; }
+.gm-item-nolink { font-size: 0.78rem; color: #8B6A4A; font-style: italic; flex-shrink: 0; }
+.btn-all-gifts {
+  display: inline-block; background: none; border: 1.5px solid #8B4513;
+  color: #8B4513; font-family: 'Lora', serif; font-size: 0.88rem;
+  padding: 10px 22px; border-radius: 40px; cursor: pointer;
+  font-style: italic; transition: background 0.18s; margin: 4px;
+}
+.btn-all-gifts:hover { background: #E8D5B0; }
 </style>
 </head>
 <body>
@@ -316,28 +364,7 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
       <div class="badge">Pregunta 1 de 2</div>
       <p class="question-label">Elige tus parlantes.</p>
       <p class="question-sub">¿Qué par habla a tu alma?</p>
-      <div class="options-grid" id="q1-options">
-        <div class="option-card" onclick="qSelect('q1',this,'Edifier Mr3')">
-          <span class="opt-icon">🔊</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA46450496" target="_blank" onclick="event.stopPropagation()">Edifier Mr3</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q1',this,'Edifier R1280T')">
-          <span class="opt-icon">🎛️</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA44709581" target="_blank" onclick="event.stopPropagation()">Edifier R1280T</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q1',this,'Edifier R1100')">
-          <span class="opt-icon">🎶</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA11913666" target="_blank" onclick="event.stopPropagation()">Edifier R1100</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q1',this,'Parlantes Hypersound SP-X2')">
-          <span class="opt-icon">🎵</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA20011733" target="_blank" onclick="event.stopPropagation()">Parlantes Hypersound SP-X2</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-      </div>
+      <div class="options-grid" id="q1-options"></div>
       <div class="btn-row">
         <button class="btn-back" onclick="qGoTo('qscreen-intro')">← Atrás</button>
         <button class="btn-primary" id="q1-next" onclick="qGoTo('qscreen-q2')" style="display:none">Siguiente →</button>
@@ -350,28 +377,7 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
       <div class="badge">Pregunta 2 de 2</div>
       <p class="question-label">Elige tus muebles.</p>
       <p class="question-sub">¿Dónde vivirá tu equipo?</p>
-      <div class="options-grid" id="q2-options">
-        <div class="option-card" onclick="qSelect('q2',this,'Rack de TV MT4000')">
-          <span class="opt-icon">🪵</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA23348633" target="_blank" onclick="event.stopPropagation()">Rack de TV MT4000</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q2',this,'Mesa Para Tv Rack Maximo Milan')">
-          <span class="opt-icon">📦</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/up/MLAU3208494865" target="_blank" onclick="event.stopPropagation()">Rack Maximo Milan</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q2',this,'Mueble De Tv Rack Dielfe')">
-          <span class="opt-icon">🌿</span>
-          <div class="opt-name"><a href="https://www.mercadolibre.com.ar/p/MLA47772582" target="_blank" onclick="event.stopPropagation()">Mueble Rack Dielfe</a></div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-        <div class="option-card" onclick="qSelect('q2',this,'TBD')">
-          <span class="opt-icon">🧱</span>
-          <div class="opt-name">TBD</div>
-          <div class="opt-desc">Description TBD</div>
-        </div>
-      </div>
+      <div class="options-grid" id="q2-options"></div>
       <div class="btn-row">
         <button class="btn-back" onclick="qGoTo('qscreen-q1')">← Atrás</button>
         <button class="btn-primary" id="q2-next" onclick="showConfirm()" style="display:none">Siguiente →</button>
@@ -433,6 +439,8 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
       </div>
       <div style="text-align:center">
         <button class="btn-primary" onclick="goToTwist()">Canjear mi regalo →</button>
+        <br>
+        <button class="btn-all-gifts" style="margin-top:0.75rem" onclick="openGiftModal()">Ver todos los regalos 🔗</button>
       </div>
     </div>
   </div><!-- end quiz-root -->
@@ -468,7 +476,83 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
 
 </div><!-- end app -->
 
+<!-- ══ GIFT LIST MODAL ══ -->
+<div id="gift-modal-overlay" onclick="if(event.target===this)closeGiftModal()">
+  <div id="gift-modal">
+    <button class="gm-close" onclick="closeGiftModal()">✕</button>
+    <div class="gm-title">Todos los regalos</div>
+    <p class="gm-sub">Todas las opciones para que puedas revisarlas cuando quieras.</p>
+
+    <div class="gm-section">
+      <div class="gm-section-label">🎵 Tocadiscos</div>
+      <div class="gm-item">
+        <span class="gm-item-icon">🎵</span>
+        <span class="gm-item-name">Tocadiscos + set de vinilo</span>
+        <span class="gm-item-nolink">incluido</span>
+      </div>
+    </div>
+
+    <div class="gm-section">
+      <div class="gm-section-label">🔊 Parlantes</div>
+      <div id="gm-speakers"></div>
+    </div>
+
+    <div class="gm-section">
+      <div class="gm-section-label">🪵 Muebles</div>
+      <div id="gm-furniture"></div>
+    </div>
+  </div>
+</div>
+
 <script>
+/* ══════════════════════════════════════════════
+   GIFT DATA — single source of truth
+══════════════════════════════════════════════ */
+const GIFT_DATA = {
+  speakers: [
+    { icon: '🔊', name: 'Edifier Mr3',               desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA46450496' },
+    { icon: '🎛️', name: 'Edifier R1280T',            desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA44709581' },
+    { icon: '🎶', name: 'Edifier R1100',              desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA11913666' },
+    { icon: '🎵', name: 'Parlantes Hypersound SP-X2', desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA20011733' },
+  ],
+  furniture: [
+    { icon: '🪵', name: 'Rack de TV MT4000',    desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA23348633' },
+    { icon: '📦', name: 'Rack Maximo Milan',     desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/up/MLAU3208494865' },
+    { icon: '🌿', name: 'Mueble Rack Dielfe',   desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA47772582' },
+    { icon: '🧱', name: 'TBD',                   desc: 'Description TBD', url: null },
+  ],
+};
+
+function renderQuizOptions() {
+  function optionCard(q, g) {
+    const nameHtml = g.url
+      ? `<a href="${g.url}" target="_blank" onclick="event.stopPropagation()">${g.name}</a>`
+      : g.name;
+    return `<div class="option-card" data-q="${q}" data-name="${g.name}" onclick="qSelect(this.dataset.q,this,this.dataset.name)">
+      <span class="opt-icon">${g.icon}</span>
+      <div class="opt-name">${nameHtml}</div>
+      <div class="opt-desc">${g.desc}</div>
+    </div>`;
+  }
+  document.getElementById('q1-options').innerHTML = GIFT_DATA.speakers.map(g => optionCard('q1', g)).join('');
+  document.getElementById('q2-options').innerHTML = GIFT_DATA.furniture.map(g => optionCard('q2', g)).join('');
+}
+
+function renderGiftModalSections() {
+  function modalItem(g) {
+    const linkHtml = g.url
+      ? `<a class="gm-item-link" href="${g.url}" target="_blank">Ver →</a>`
+      : `<span class="gm-item-nolink">próximamente</span>`;
+    return `<div class="gm-item">
+      <span class="gm-item-icon">${g.icon}</span>
+      <span class="gm-item-name">${g.name}</span>
+      ${linkHtml}
+    </div>`;
+  }
+  document.getElementById('gm-speakers').innerHTML  = GIFT_DATA.speakers.map(modalItem).join('');
+  document.getElementById('gm-furniture').innerHTML = GIFT_DATA.furniture.map(modalItem).join('');
+}
+
 /* ══════════════════════════════════════════════
    QUIZ LOGIC
 ══════════════════════════════════════════════ */
@@ -528,15 +612,15 @@ const ctx = canvas.getContext('2d');
 const W = 460, H = 380;
 
 const ALL_QUESTIONS = [
-  { gift:{icon:'🎁',name:'Regalo 1',desc:'Descripción del regalo 1'}, text:"Pregunta 1: ¿Placeholder A o B?", answers:[{label:"Opción A",color:"#8B4513",correct:true},{label:"Opción B",color:"#2C5F8B",correct:false}] },
-  { gift:{icon:'🎶',name:'Regalo 2',desc:'Descripción del regalo 2'}, text:"Pregunta 2: ¿Placeholder C o D?", answers:[{label:"Opción C",color:"#2C5F8B",correct:false},{label:"Opción D",color:"#3A8B2C",correct:true}] },
-  { gift:{icon:'🌟',name:'Regalo 3',desc:'Descripción del regalo 3'}, text:"Pregunta 3: ¿Placeholder E o F?", answers:[{label:"Opción E",color:"#8B6A2C",correct:true},{label:"Opción F",color:"#8B2C2C",correct:false}] },
-  { gift:{icon:'🪴',name:'Regalo 4',desc:'Descripción del regalo 4'}, text:"Pregunta 4: ¿Placeholder G o H?", answers:[{label:"Opción G",color:"#3A8B2C",correct:true},{label:"Opción H",color:"#8B4513",correct:false}] },
-  { gift:{icon:'🎨',name:'Regalo 5',desc:'Descripción del regalo 5'}, text:"Pregunta 5: ¿Placeholder I o J?", answers:[{label:"Opción I",color:"#8B2C2C",correct:false},{label:"Opción J",color:"#2C5F8B",correct:true}] },
-  { gift:{icon:'📚',name:'Regalo 6',desc:'Descripción del regalo 6'}, text:"Pregunta 6: ¿Placeholder K o L?", answers:[{label:"Opción K",color:"#5A3A8B",correct:true},{label:"Opción L",color:"#3A8B2C",correct:false}] },
-  { gift:{icon:'🧁',name:'Regalo 7',desc:'Descripción del regalo 7'}, text:"Pregunta 7: ¿Placeholder M o N?", answers:[{label:"Opción M",color:"#8B4513",correct:false},{label:"Opción N",color:"#8B6A2C",correct:true}] },
-  { gift:{icon:'🎭',name:'Regalo 8',desc:'Descripción del regalo 8'}, text:"Pregunta 8: ¿Placeholder O o P?", answers:[{label:"Opción O",color:"#2C5F8B",correct:true},{label:"Opción P",color:"#8B2C2C",correct:false}] },
-  { gift:{icon:'🌙',name:'Regalo 9',desc:'Descripción del regalo 9'}, text:"Pregunta 9: ¿Placeholder Q o R?", answers:[{label:"Opción Q",color:"#3A8B2C",correct:false},{label:"Opción R",color:"#5A3A8B",correct:true}] }
+  { text:"Pregunta 1: En el momento en el que estoy escribiendo esta pregunta, ¿cuántos mensajes hay en nuestro chat de telegram?", answers:[{label:"700mil",color:"#8B4513",correct:true},{label:"500mil",color:"#2C5F8B",correct:false}] },
+  { text:"Pregunta 2: ¿Dónde fue nuestra pirmera selfie?", answers:[{label:"Grama",color:"#2C5F8B",correct:false},{label:"El Punto",color:"#3A8B2C",correct:true}] },
+  { text:"Pregunta 3: ¿Qué palabra se ha dicho mas en nuestro chat?", answers:[{label:"Daniela",color:"#8B6A2C",correct:true},{label:"Marico",color:"#8B2C2C",correct:false}] },
+  { text:"Pregunta 4: ¿Quién ha escrito más mensajes? (puntos extras si me dices el % de mensajes que escribio esa persona)", answers:[{label:"Eduardo",color:"#3A8B2C",correct:true},{label:"Daniela",color:"#8B4513",correct:false}] },
+  { text:"Pregunta 5: ¿Quién grita mas?", answers:[{label:"Daniela",color:"#8B2C2C",correct:false},{label:"Eduardo",color:"#2C5F8B",correct:true}] },
+  { text:"Pregunta 6: ¿Quién manda mas mensajes de 1 sola palabra?", answers:[{label:"Daniela",color:"#5A3A8B",correct:true},{label:"Eduardo",color:"#3A8B2C",correct:false}] },
+  { text:"Pregunta 7: Tengo una lista de todas las palabras de nuestro chat, ¿qué nombre de hombre aparece más?", answers:[{label:"Eduardo",color:"#8B4513",correct:false},{label:"Rafael",color:"#8B6A2C",correct:true}] },
+  { text:"Pregunta 8: La mayor cantidad de mensajes en 1 hora en el chat fue de 675, ¿qué evento marcó este hito?", answers:[{label:"TLOAS release",color:"#2C5F8B",correct:true},{label:"Manifesting NYC",color:"#8B2C2C",correct:false}] },
+  { text:"Pregunta 9: El día que nos mandamos más mensajes, nos mandamos 2346 mensajes, ¿qué pasó ese día?", answers:[{label:"Eduardo emigró a NYC",color:"#3A8B2C",correct:true},{label:"Literalmente a random tuesday",color:"#5A3A8B",correct:false}] }
 ];
 
 function pickRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
@@ -685,7 +769,10 @@ function showResultScreen() {
         <div class="fcard-stamp"><span class="fstamp-sm">Canjeado</span><span class="fstamp-yr">2025</span><span class="fstamp-sm">con amor</span></div>
       </div>
     </div>
-    ${retryBlock}`;
+    ${retryBlock}
+    <div style="text-align:center;margin-top:0.75rem">
+      <button class="btn-all-gifts" onclick="openGiftModal()">Ver todos los regalos 🔗</button>
+    </div>`;
   rs.style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -758,7 +845,20 @@ function rr(x,y,w,h,r) {
   ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
 }
 
+/* ── Init ── */
+renderQuizOptions();
+renderGiftModalSections();
+
 gDraw();
+
+/* ── GIFT LIST MODAL ── */
+function openGiftModal() {
+  document.getElementById('gift-modal-overlay').classList.add('open');
+}
+function closeGiftModal() {
+  document.getElementById('gift-modal-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGiftModal(); });
 </script>
 </body>
 </html>
