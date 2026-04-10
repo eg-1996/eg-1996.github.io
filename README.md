@@ -510,16 +510,16 @@ canvas { display:block; width:100%; border-left:2px solid #C4A87A; border-right:
 ══════════════════════════════════════════════ */
 const GIFT_DATA = {
   speakers: [
-    { icon: '🔊', name: 'Edifier Mr3',               desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA46450496' },
-    { icon: '🎛️', name: 'Edifier R1280T',            desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA44709581' },
-    { icon: '🎶', name: 'Edifier R1100',              desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA11913666' },
-    { icon: '🎵', name: 'Parlantes Hypersound SP-X2', desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA20011733' },
+    { icon: '🔊', name: 'Edifier Mr3',               desc: 'Buena marca y se ve bien!', url: 'https://www.mercadolibre.com.ar/p/MLA46450496' },
+    { icon: '🎛️', name: 'Edifier R1280T',            desc: 'Estos son mi recomndacion pero maybe you hate the color', url: 'https://www.mercadolibre.com.ar/p/MLA44709581' },
+    { icon: '🎶', name: 'Edifier R1100',              desc: 'Por si quieres solo negros', url: 'https://www.mercadolibre.com.ar/p/MLA11913666' },
+    { icon: '🎵', name: 'Parlantes Hypersound SP-X2', desc: 'Si me quieres ahorrar algunos pesitos', url: 'https://www.mercadolibre.com.ar/p/MLA20011733' },
   ],
   furniture: [
-    { icon: '🪵', name: 'Rack de TV MT4000',    desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA23348633' },
-    { icon: '📦', name: 'Rack Maximo Milan',     desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/up/MLAU3208494865' },
-    { icon: '🌿', name: 'Mueble Rack Dielfe',   desc: 'Description TBD', url: 'https://www.mercadolibre.com.ar/p/MLA47772582' },
-    { icon: '🧱', name: 'TBD',                   desc: 'Description TBD', url: null },
+    { icon: '🪵', name: 'Rack de TV MT4000',    desc: 'Este me lo recomendó ML mientras veia tu wishlist', url: 'https://www.mercadolibre.com.ar/p/MLA23348633' },
+    { icon: '📦', name: 'Rack Maximo Milan',     desc: 'en mi opinión, el mas interesante', url: 'https://www.mercadolibre.com.ar/up/MLAU3208494865' },
+    { icon: '🌿', name: 'Mueble Rack Dielfe',   desc: 'si quieres algo mas simple', url: 'https://www.mercadolibre.com.ar/p/MLA47772582' },
+    { icon: '🧱', name: 'Choose Your own!',     desc: 'Nadie tiene mejor gusto que tu!', url: null },
   ],
 };
 
@@ -650,10 +650,32 @@ function updateHUD() {
   document.getElementById('lives-txt').textContent = Array(3).fill(null).map((_,i)=>i<lives?'❤️':'🖤').join(' ');
 }
 
+function measureBox(label, font, maxW) {
+  ctx.save(); ctx.font = font;
+  const words = label.split(' ');
+  const lines = []; let cur = '';
+  for (const w of words) {
+    const test = cur ? cur+' '+w : w;
+    if (ctx.measureText(test).width > maxW - 16) { if(cur) lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  const lineH = 15;
+  const textW = Math.max(...lines.map(l => ctx.measureText(l).width));
+  ctx.restore();
+  return { lines, w: Math.max(80, textW + 24), h: Math.max(44, lines.length * lineH + 20) };
+}
+
 function spawnPipe() {
   const q = gQuestions[qIdx];
-  const topY = 90 + Math.random()*70;
-  pipes.push({ x:W+10, topY, botY:topY+160, w:80, h:80, answered:false, answers:q.answers, hit:null });
+  const font = 'bold 12px Georgia';
+  const m0 = measureBox(q.answers[0].label, font, 160);
+  const m1 = measureBox(q.answers[1].label, font, 160);
+  const w = Math.max(m0.w, m1.w);
+  const h0 = m0.h, h1 = m1.h;
+  const topY = 60 + Math.random()*70;
+  const gap = 60;
+  pipes.push({ x:W+10, topY, botY:topY + Math.max(h0,h1) + gap + Math.max(h0,h1), w, h0, h1, gap, answered:false, answers:q.answers, hit:null, lines0:m0.lines, lines1:m1.lines });
 }
 
 function gFlap() {
@@ -681,8 +703,8 @@ function gUpdate(dt) {
   for (let p of pipes) {
     p.x -= 2.2*dt;
     if (!p.answered) {
-      if (rCircle(p.x,p.topY-p.h/2,p.w,p.h,bird.x,bird.y,bird.r)) { p.answered=true; p.hit='top'; onAnswer(p.answers[0]); return; }
-      if (rCircle(p.x,p.botY-p.h/2,p.w,p.h,bird.x,bird.y,bird.r)) { p.answered=true; p.hit='bot'; onAnswer(p.answers[1]); return; }
+      if (rCircle(p.x,p.topY,p.w,p.h0,bird.x,bird.y,bird.r)) { p.answered=true; p.hit='top'; onAnswer(p.answers[0]); return; }
+      if (rCircle(p.x,p.topY+p.h0+p.gap,p.w,p.h1,bird.x,bird.y,bird.r)) { p.answered=true; p.hit='bot'; onAnswer(p.answers[1]); return; }
     }
   }
   pipes = pipes.filter(p=>p.x+p.w>-10);
@@ -800,23 +822,23 @@ function gDraw() {
 
   for (let p of pipes) {
     ctx.fillStyle='#5A8A3A';
-    ctx.fillRect(p.x+p.w/2-8, p.topY+p.h/2, 16, p.botY-p.topY-p.h);
-    drawBox(p.x, p.topY-p.h/2, p.w, p.h, p.answers[0], p.answered&&p.hit==='top');
-    drawBox(p.x, p.botY-p.h/2, p.w, p.h, p.answers[1], p.answered&&p.hit==='bot');
+    ctx.fillRect(p.x+p.w/2-8, p.topY+p.h0, 16, p.gap);
+    drawBox(p.x, p.topY, p.w, p.h0, p.answers[0], p.answered&&p.hit==='top', p.lines0);
+    drawBox(p.x, p.topY+p.h0+p.gap, p.w, p.h1, p.answers[1], p.answered&&p.hit==='bot', p.lines1);
   }
   drawBird(bird.x, bird.y, bird.vy);
 }
 
-function drawBox(x,y,w,h,answer,hit) {
+function drawBox(x,y,w,h,answer,hit,lines) {
   ctx.save();
   ctx.fillStyle = hit ? '#FFD700' : answer.color;
   rr(x,y,w,h,10); ctx.fill();
   ctx.strokeStyle = hit ? '#B8860B' : 'rgba(0,0,0,0.2)';
   ctx.lineWidth=2; ctx.stroke();
   ctx.fillStyle='#fff'; ctx.font='bold 12px Georgia'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  const words=answer.label.split(' ');
-  if(words.length>2){const m=Math.ceil(words.length/2);ctx.fillText(words.slice(0,m).join(' '),x+w/2,y+h/2-8);ctx.fillText(words.slice(m).join(' '),x+w/2,y+h/2+8);}
-  else ctx.fillText(answer.label,x+w/2,y+h/2);
+  const lineH = 15;
+  const startY = y + h/2 - (lines.length-1)*lineH/2;
+  for (let i=0; i<lines.length; i++) ctx.fillText(lines[i], x+w/2, startY + i*lineH);
   ctx.restore();
 }
 
